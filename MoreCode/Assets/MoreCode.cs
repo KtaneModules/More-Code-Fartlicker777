@@ -12,7 +12,9 @@ public class MoreCode : MonoBehaviour {
     public KMAudio Audio;
     public KMSelectable[] AidsNumbers;
     public KMSelectable AidsSubmit;
+    public KMColorblindMode Colorblind;
     public TextMesh[] AidsText;
+    public TextMesh CBText;
     public GameObject MoreAids;
     public Material[] Aids;
     string[] AidsWords = {"ALLOCATE","BULWARKS","COMPILER","DISPOSAL","ENCIPHER","FORMULAE","GAUNTLET","HUNKERED","ILLUSORY","JOUSTING","KINETICS","LINKWORK","MONOLITH","NANOBOTS","OCTANGLE","POSTSYNC","QUARTICS","REVOLVED","STANZAIC","TOMAHAWK","ULTRAHOT","VENDETTA","WAFFLERS","YOKOZUNA","ZUGZWANG","AidsCheck"};
@@ -34,9 +36,12 @@ public class MoreCode : MonoBehaviour {
     int FaultyButInt = 0;
     int Broken = 0;
     int NumberThatINeed = 0;
+    int correct = 0;
+    bool cbactive = false;
     bool AEIOUCheck = false;
     bool FaultyCheck = false;
     bool BrokenCheck = false;
+    bool activated = false;
     bool coma = false;
     private List<int> BobsDickAndVowel = new List<int>{248,243,201,238,200,291,297,268,275,269,232,211,296};
     private List<int> BobsDick = new List<int>{276,242,274,213,214,212,280,258,271,204,210,246,227};
@@ -54,11 +59,12 @@ public class MoreCode : MonoBehaviour {
 
     void Awake () {
         moduleId = moduleIdCounter++;
-
+        cbactive = Colorblind.ColorblindModeActive;
         foreach (KMSelectable Number in AidsNumbers) {
             Number.OnInteract += delegate () { NumberPress(Number); return false; };
         }
         AidsSubmit.OnInteract += delegate () { SubmitPress(); return false; };
+        GetComponent<KMBombModule>().OnActivate += OnActivate;
     }
 
     void Start () {
@@ -91,12 +97,23 @@ public class MoreCode : MonoBehaviour {
       if (Broken == 2) {
         BrokenCheck = true;
       }
-      StartCoroutine(AidsPicker());
     }
+
+    void OnActivate()
+    {
+        AidsText[0].text = First.ToString();
+        AidsText[1].text = Comma;
+        AidsText[2].text = Second.ToString();
+        AidsText[3].text = Third.ToString();
+        AidsText[4].text = Fourth.ToString();
+        StartCoroutine(AidsPicker());
+        activated = true;
+    }
+
     void NumberPress(KMSelectable Number){
       Number.AddInteractionPunch();
   		GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Number.transform);
-      if (moduleSolved == true) {
+      if (moduleSolved == true || !activated) {
         return;
       }
       for (int i = 0; i < 5; i++) {
@@ -141,33 +158,49 @@ public class MoreCode : MonoBehaviour {
     void SubmitPress(){
       AidsSubmit.AddInteractionPunch();
   		GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, AidsSubmit.transform);
-      if (moduleSolved == true) {
+      if (moduleSolved == true || !activated) {
         return;
       }
       NumberYouSubmit = Second * 100 + Third * 10 + Fourth;
       if (coma == true) {
         GetComponent<KMBombModule>().HandleStrike();
         StopAllCoroutines();
+        Audio.PlaySoundAtTransform("strike", transform);
         MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
         Anger = false;
         PlacementCheck = false;
         Debug.LogFormat("[More Code #{0}] You submitted with a comma. Strike dumbass! Resetting...", moduleId);
         StartCoroutine(AidsPicker());
+        return;
       }
       if (First != 4) {
         GetComponent<KMBombModule>().HandleStrike();
         StopAllCoroutines();
+        Audio.PlaySoundAtTransform("strike", transform);
         MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
         Anger = false;
         PlacementCheck = false;
         Debug.LogFormat("[More Code #{0}] You submitted without a preceeding 4. Strike, dumbass! Resetting...", moduleId);
         StartCoroutine(AidsPicker());
+        return;
       }
       if (Anger == true && NumberYouSubmit == 265) {
         StopAllCoroutines();
+        Audio.PlaySoundAtTransform("solve", transform);
         StartCoroutine(SolvingAids());
       }
       if (Anger == true && NumberYouSubmit == 265) {
+        return;
+      }
+      if (Anger == true && NumberYouSubmit != 265) {
+        GetComponent<KMBombModule>().HandleStrike();
+        StopAllCoroutines();
+        Audio.PlaySoundAtTransform("strike", transform);
+        MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
+        Anger = false;
+        PlacementCheck = false;
+        Debug.LogFormat("[More Code #{0}] You submitted 4.{1}. Strike, window-licker. Resetting...", moduleId, NumberYouSubmit);
+        StartCoroutine(AidsPicker());
         return;
       }
       for (int i = 0; i < 13; i++) {
@@ -178,11 +211,13 @@ public class MoreCode : MonoBehaviour {
       if (PlacementCheck == true) {
         if ((Bomb.IsIndicatorOn("BOB") && AEIOUCheck == true && BobsDickAndVowel[NumberThatINeed] == NumberYouSubmit) || (Bomb.IsIndicatorOn("BOB") && BobsDick[NumberThatINeed] == NumberYouSubmit) || (FaultyCheck == true && Faulty[NumberThatINeed] == NumberYouSubmit) || (OtherwiseAM[NumberThatINeed] == NumberYouSubmit)) {
           StopAllCoroutines();
+          Audio.PlaySoundAtTransform("solve", transform);
           StartCoroutine(SolvingAids());
         }
         else {
           GetComponent<KMBombModule>().HandleStrike();
           StopAllCoroutines();
+          Audio.PlaySoundAtTransform("strike", transform);
           MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
           Anger = false;
           PlacementCheck = false;
@@ -193,11 +228,13 @@ public class MoreCode : MonoBehaviour {
       else {
         if ((Bomb.GetBatteryCount() - 2 >= 0 && BrokenCheck == true && TwoBatAndBroken[NumberThatINeed - 13] == NumberYouSubmit) || (Bomb.GetBatteryCount() - 2 >= 0 && TwoBat[NumberThatINeed - 13] == NumberYouSubmit) || (Bomb.IsIndicatorOn("TRN") && TRN[NumberThatINeed - 13] == NumberYouSubmit) || (OtherwiseNZ[NumberThatINeed - 13] == NumberYouSubmit)) {
           StopAllCoroutines();
+          Audio.PlaySoundAtTransform("solve", transform);
           StartCoroutine(SolvingAids());
         }
         else {
           GetComponent<KMBombModule>().HandleStrike();
           StopAllCoroutines();
+          Audio.PlaySoundAtTransform("strike", transform);
           MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
           Anger = false;
           PlacementCheck = false;
@@ -218,32 +255,35 @@ public class MoreCode : MonoBehaviour {
       }
       Debug.LogFormat("[More Code #{0}] The word that is flashing is {1}.", moduleId, FuckAids);
       if (Anger == true) {
+        correct = 265;
         Debug.LogFormat("[More Code #{0}] The word is not within any list. Submit 4.265.", moduleId);
       }
       else if (Bomb.IsIndicatorOn("BOB") && AEIOUCheck == true && NumberThatINeed <= 12) {
-        Debug.LogFormat("[More Code #{0}] The number you should submit is 4.{1}.", moduleId, BobsDickAndVowel[NumberThatINeed]);
+        correct = BobsDickAndVowel[NumberThatINeed];
       }
       else if (Bomb.IsIndicatorOn("BOB") && NumberThatINeed <= 12) {
-        Debug.LogFormat("[More Code #{0}] The number you should submit is 4.{1}.", moduleId, BobsDick[NumberThatINeed]);
+        correct = BobsDick[NumberThatINeed];
       }
       else if (FaultyCheck == true && NumberThatINeed <= 12) {
-        Debug.LogFormat("[More Code #{0}] The number you should submit is 4.{1}.", moduleId, Faulty[NumberThatINeed]);
+        correct = Faulty[NumberThatINeed];
       }
       else if (NumberThatINeed <= 12) {
-        Debug.LogFormat("[More Code #{0}] The number you should submit is 4.{1}.", moduleId, OtherwiseAM[NumberThatINeed]);
+        correct = OtherwiseAM[NumberThatINeed];
       }
       else if (Bomb.GetBatteryCount() - 2 >= 0 && BrokenCheck == true) {
-        Debug.LogFormat("[More Code #{0}] The number you should submit is 4.{1}.", moduleId, TwoBatAndBroken[NumberThatINeed - 13]);
+        correct = TwoBatAndBroken[NumberThatINeed - 13];
       }
       else if (Bomb.GetBatteryCount() - 2 >= 0) {
-        Debug.LogFormat("[More Code #{0}] The number you should submit is 4.{1}.", moduleId, TwoBat[NumberThatINeed - 13]);
+        correct = TwoBat[NumberThatINeed - 13];
       }
       else if (Bomb.IsIndicatorOn("TRN")) {
-        Debug.LogFormat("[More Code #{0}] The number you should submit is 4.{1}.", moduleId, TRN[NumberThatINeed - 13]);
+        correct = TRN[NumberThatINeed - 13];
       }
       else {
-        Debug.LogFormat("[More Code #{0}] The number you should submit is 4.{1}.", moduleId, OtherwiseNZ[NumberThatINeed - 13]);
+        correct = OtherwiseNZ[NumberThatINeed - 13];
       }
+      if (correct != 265)
+        Debug.LogFormat("[More Code #{0}] The frequency you should submit is 4.{1}.", moduleId, correct);
       yield return null;
       StartCoroutine(juyhkmghgjmhgnjvmgnhmfjgjhmfnhgjmn());
     }
@@ -254,32 +294,52 @@ public class MoreCode : MonoBehaviour {
             for (int x = 0; x < AlphabetMoreAids[j].Length; x++) {
               if (AlphabetMoreAids[j][x] == ',') {
                 MoreAids.GetComponent<MeshRenderer>().material = Aids[1];
+                if (cbactive)
+                  CBText.text = MoreAids.GetComponent<MeshRenderer>().material.name.Replace(" (Instance)", "");
                 yield return new WaitForSeconds(.2f);
                 MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
+                if (cbactive)
+                  CBText.text = "";
                 yield return new WaitForSeconds(1f);
               }
               else if (AlphabetMoreAids[j][x] == '.') {
                 MoreAids.GetComponent<MeshRenderer>().material = Aids[1];
+                if (cbactive)
+                  CBText.text = MoreAids.GetComponent<MeshRenderer>().material.name.Replace(" (Instance)", "");
                 yield return new WaitForSeconds(.6f);
                 MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
+                if (cbactive)
+                  CBText.text = "";
                 yield return new WaitForSeconds(1f);
               }
               else if (AlphabetMoreAids[j][x] == '=') {
                 MoreAids.GetComponent<MeshRenderer>().material = Aids[1];
+                if (cbactive)
+                  CBText.text = MoreAids.GetComponent<MeshRenderer>().material.name.Replace(" (Instance)", "");
                 yield return new WaitForSeconds(1f);
                 MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
+                if (cbactive)
+                  CBText.text = "";
                 yield return new WaitForSeconds(1f);
               }
               else if (AlphabetMoreAids[j][x] == '-')  {
                 MoreAids.GetComponent<MeshRenderer>().material = Aids[1];
+                if (cbactive)
+                  CBText.text = MoreAids.GetComponent<MeshRenderer>().material.name.Replace(" (Instance)", "");
                 yield return new WaitForSeconds(3f);
                 MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
+                if (cbactive)
+                  CBText.text = "";
                 yield return new WaitForSeconds(1f);
               }
             }
             MoreAids.GetComponent<MeshRenderer>().material = Aids[2];
+            if (cbactive)
+              CBText.text = MoreAids.GetComponent<MeshRenderer>().material.name.Replace(" (Instance)", "");
             yield return new WaitForSeconds(1f);
             MoreAids.GetComponent<MeshRenderer>().material = Aids[0];
+            if (cbactive)
+              CBText.text = "";
             yield return new WaitForSeconds(1f);
           }
         }
@@ -291,18 +351,112 @@ public class MoreCode : MonoBehaviour {
       for (int i = 0; i < 5; i++) {
         AidsText[i].text = (UnityEngine.Random.Range(0,10)).ToString();
       }
-        MoreAids.GetComponent<MeshRenderer>().material = Aids[UnityEngine.Random.Range(0,4)];
-      if (FanfareAids == 100) {
+      if (FanfareAids % 2 == 0)
+      {
+        MoreAids.GetComponent<MeshRenderer>().material = Aids[UnityEngine.Random.Range(0, 4)];
+        if (cbactive)
+        {
+          if (MoreAids.GetComponent<MeshRenderer>().material.name.Equals("black (Instance)"))
+            CBText.text = "";
+          else
+            CBText.text = MoreAids.GetComponent<MeshRenderer>().material.name.Replace(" (Instance)", "");
+        }
+      }
+      if (FanfareAids == 40) {
         GetComponent<KMBombModule>().HandlePass();
         moduleSolved = true;
         MoreAids.GetComponent<MeshRenderer>().material = Aids[3];
+        if (cbactive)
+          CBText.text = MoreAids.GetComponent<MeshRenderer>().material.name.Replace(" (Instance)", "");
         for (int i = 0; i < 5; i++) {
           AidsText[i].text = "!";
         }
       }
       else {
-        yield return new WaitForSecondsRealtime(0.1f);
+        yield return new WaitForSecondsRealtime(0.05f);
         StartCoroutine(SolvingAids());
       }
+    }
+
+    //twitch plays
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} transmit/trans/tx <frq> [Submits the specified frequency 'frq'] | !{0} colorblind [Toggles colorblind mode]";
+    #pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        if (Regex.IsMatch(command, @"^\s*colorblind\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (cbactive)
+            {
+                cbactive = false;
+                CBText.text = "";
+            }
+            else
+            {
+                cbactive = true;
+                if (MoreAids.GetComponent<MeshRenderer>().material.name.Equals("black (Instance)"))
+                    CBText.text = "";
+                else
+                    CBText.text = MoreAids.GetComponent<MeshRenderer>().material.name.Replace(" (Instance)", "");
+            }
+            yield break;
+        }
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*transmit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(parameters[0], @"^\s*trans\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(parameters[0], @"^\s*tx\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (parameters.Length > 2)
+            {
+                yield return "sendtochaterror Too many parameters!";
+            }
+            else if (parameters.Length == 2)
+            {
+                if (Regex.IsMatch(parameters[1], @"[0-9].[0-9][0-9][0-9]") || Regex.IsMatch(parameters[1], @"[0-9],[0-9][0-9][0-9]"))
+                {
+                    for (int i = 0; i < 5; i++)
+                    {
+                        while (AidsText[i].text != parameters[1][i].ToString())
+                        {
+                            AidsNumbers[i].OnInteract();
+                            yield return new WaitForSeconds(0.1f);
+                        }
+                    }
+                    AidsSubmit.OnInteract();
+                    if (parameters[1].Equals("4." + correct))
+                    {
+                        yield return "solve";
+                    }
+                }
+                else
+                {
+                    yield return "sendtochaterror The specified frequency '" + parameters[1] + "' is invalid!";
+                }
+            }
+            else if (parameters.Length == 1)
+            {
+                yield return "sendtochaterror Please specify the frequency to submit!";
+            }
+            yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while (!activated) { yield return true; yield return new WaitForSeconds(0.1f); }
+        if (FanfareAids == 0)
+        {
+            string corr = "4."+correct;
+            for (int i = 0; i < 5; i++)
+            {
+                while (AidsText[i].text != corr[i].ToString())
+                {
+                    AidsNumbers[i].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+            AidsSubmit.OnInteract();
+        }
+        while (!moduleSolved) { yield return true; yield return new WaitForSeconds(0.1f); }
     }
 }
