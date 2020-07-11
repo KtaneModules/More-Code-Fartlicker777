@@ -20,7 +20,7 @@ public class MoreCode : MonoBehaviour {
     string[] AidsWords = {"ALLOCATE","BULWARKS","COMPILER","DISPOSAL","ENCIPHER","FORMULAE","GAUNTLET","HUNKERED","ILLUSORY","JOUSTING","KINETICS","LINKWORK","MONOLITH","NANOBOTS","OCTANGLE","POSTSYNC","QUARTICS","REVOLVED","STANZAIC","TOMAHAWK","ULTRAHOT","VENDETTA","WAFFLERS","YOKOZUNA","ZUGZWANG","AidsCheck"};
     string[] FakeAidsL = {"ALLOTYPE","BULKHEAD","COMPUTER","DISPATCH","ENCRYPTS","FORTUNES","GATEWAYS","HUNTRESS","ILLUSION","JUNCTION","KILOBYTE","LINKAGES","MONOGRAM","NANOGRAM","OCTUPLES","POSITRON","QUINTICS","REVEALED","STOCCATA","TOMOGRAM","ULTRARED","VENOMOUS","WEAKENED","XENOLITH","YEASAYER","ZYMOGRAM"};
     //Dit I ,|| Dot O .|| Dah A =|| Dash S -
-    string[] AlphabetMoreAids = {".-.,.","=","=,,","=,-",".,.-=","-.-",".",",..","=--=,","=.,",",","=-,=",",,.","--.=","-----","-","==.",",--=","-.==","=.,,","=====","=,",",=","=.","-,",",=-"};
+    string[] AlphabetMoreAids = {".-.,.","=","=,,","=,-",".,.-=","-.-",".",",..","=--=,","=.,",",","=-,=",",,.","--.=","-----","-","==.",",--=","-,==","=.,,","=====","=,",",=","=.","-,",",=-"};
     string AlphbetAids = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     string FuckAids = "";
     int First = 4;
