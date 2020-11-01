@@ -72,20 +72,22 @@ public class MoreCode : MonoBehaviour {
 
     void Start () {
       SerialNumber = Bomb.GetSerialNumber();
-        if (SerialNumber.Contains("AUY")) {
-          AEIOUY += 1;
-          FaultyButInt += 1;
+      for (int i = 0; i < 6; i++) {
+        if (SerialNumber[i].ToString().Any(x => "AUY".Contains(x))) {
+          AEIOUY++;
+          FaultyButInt++;
         }
-        if (SerialNumber.Contains("EO")) {
-          AEIOUY += 1;
-          Broken += 1;
+        if (SerialNumber[i].ToString().Any(x => "EO".Contains(x))) {
+          AEIOUY++;
+          Broken++;
         }
-        if (SerialNumber.Contains("I"))
-          AEIOUY += 1;
-        if (SerialNumber.Contains("FLT"))
-          FaultyButInt += 1;
-        if (SerialNumber.Contains("BRKN"))
-          Broken += 1;
+        if (SerialNumber[i].ToString().Any(x => "I".Contains(x)))
+          AEIOUY++;
+        if (SerialNumber[i].ToString().Any(x => "FLT".Contains(x)))
+          FaultyButInt++;
+        if (SerialNumber[i].ToString().Any(x => "BRKN".Contains(x)))
+          Broken++;
+      }
       if (AEIOUY == 1)
         AEIOUCheck = true;
       if (FaultyButInt == 1)

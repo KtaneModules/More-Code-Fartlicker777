@@ -548,6 +548,7 @@ GameObject:
   - component: {fileID: 114915473299363512}
   - component: {fileID: 114454383462897410}
   - component: {fileID: 114853960920223876}
+  - component: {fileID: 114174329061018520}
   - component: {fileID: 114139553842080666}
   - component: {fileID: 114691349657053368}
   m_Layer: 0
@@ -3167,6 +3168,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShaderNames:
   - KT/Mobile/DiffuseTint
+--- !u!114 &114174329061018520
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1676409040304040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1cfb889a07d5fd4e9baed7960bb397f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _colorblindMode: 0
 --- !u!114 &114214066308313864
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3511,12 +3524,14 @@ MonoBehaviour:
   - {fileID: 114305913234840098}
   - {fileID: 114967042945318814}
   AidsSubmit: {fileID: 114329457636384196}
+  Colorblind: {fileID: 114174329061018520}
   AidsText:
   - {fileID: 102348042145109520}
   - {fileID: 102951262973230204}
   - {fileID: 102919558960155304}
   - {fileID: 102995577845402666}
   - {fileID: 102812103547742176}
+  CBText: {fileID: 102852842607883378}
   MoreAids: {fileID: 1506565334781890}
   Aids:
   - {fileID: 2100000, guid: e6ddc669e9faa4dad93207caa5a7c773, type: 2}
