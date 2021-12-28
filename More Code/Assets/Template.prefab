@@ -3517,23 +3517,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Bomb: {fileID: 114454383462897410}
   Audio: {fileID: 114915473299363512}
-  AidsNumbers:
+  Buttons:
   - {fileID: 114290851526781064}
   - {fileID: 114749563760243636}
   - {fileID: 114000447589179608}
   - {fileID: 114305913234840098}
   - {fileID: 114967042945318814}
-  AidsSubmit: {fileID: 114329457636384196}
+  SubmitButton: {fileID: 114329457636384196}
   Colorblind: {fileID: 114174329061018520}
-  AidsText:
+  NumberTexts:
   - {fileID: 102348042145109520}
   - {fileID: 102951262973230204}
   - {fileID: 102919558960155304}
   - {fileID: 102995577845402666}
   - {fileID: 102812103547742176}
   CBText: {fileID: 102852842607883378}
-  MoreAids: {fileID: 1506565334781890}
-  Aids:
+  FlashDisplay: {fileID: 1506565334781890}
+  Colors:
   - {fileID: 2100000, guid: e6ddc669e9faa4dad93207caa5a7c773, type: 2}
   - {fileID: 2100000, guid: 87e6e2009c503428b9144a38bc9fdf3c, type: 2}
   - {fileID: 2100000, guid: 0b8345d6190d14013b825698a59f7759, type: 2}

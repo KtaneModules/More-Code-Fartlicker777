@@ -14,9 +14,10 @@ MonoBehaviour:
   id: MoreCode
   title: More Code
   author: Me
-  description: "Because reading and memorizing morse was too easy.\r\n\r\nManual can
-    be found at ktane.timwi.com\r\n\r\nIf you find any bugs, contact Fartlicker777#9169
-    on Discord.\r\n"
+  description: "Because reading and memorizing morse was too easy.\r\n\nDetermine
+    the word flashing in More Code and submit its correlating frequency.\n\r\nManual
+    can be found at ktane.timwi.com or in the manuals folder of the game.\r \n\r\nIf
+    you find any bugs, contact Fartlicker777#9169 on Discord.\r"
   version: 
   outputFolder: build
   previewImage: {fileID: 2800000, guid: fb236a2240b05714595bf3a8eef16dbe, type: 3}
